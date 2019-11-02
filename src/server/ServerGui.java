@@ -139,13 +139,11 @@ public class ServerGui {
 
 		btnStart.setBounds(516, 155, 143, 43);			/////// Vi tri button START
 		frmServerMangement.getContentPane().add(btnStart);
-		btnStart.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/play4.png")));
 
 		JButton btnStop = new JButton("STOP");
 		btnStop.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnStop.setBounds(516, 215, 143, 43);						//// Vi tri button Stop
 		frmServerMangement.getContentPane().add(btnStop);
-		btnStop.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/stop1.png")));
 
 		btnStop.addActionListener(new ActionListener() {
 
