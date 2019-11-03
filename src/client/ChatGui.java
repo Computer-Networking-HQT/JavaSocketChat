@@ -1,7 +1,7 @@
 package client;
-
-import java.awt.EventQueue;
-
+// Java Swing ở trên cùng của AWT (Abstract Windowing Toolkit) API
+import java.awt.*;
+// Các class package produce : JButton, JTextField, JTextArea, JRadioButton, JCheckbox, JMenu, JColorChooser
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.Label;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,9 +32,8 @@ import data.DataFile;
 import tags.Decode;
 import tags.Encode;
 import tags.Tags;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.Color;
+
+import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JTextPane;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -46,7 +44,7 @@ public class ChatGui {
 
 	private static String URL_DIR = System.getProperty("user.dir");
 	private static String TEMP = "/temp/";
-
+	private static float LEFT_ALIGNMENT;
 	private ChatRoom chat;
 	private Socket socketChat;
 	private String nameUser = "", nameGuest = "", nameFile = "";
@@ -59,31 +57,33 @@ public class ChatGui {
 	public boolean isStop = false, isSendFile = false, isReceiveFile = false;
 	private JProgressBar progressSendFile;
 	private JTextField txtPath;
-	private int portServer = 0;
+	private int portServer = 0;  // this.portServer
 	private JTextField txtMessage;
 	private JScrollPane scrollPane;
-	private JButton btnSmileBigIcon;
+	/* private JButton btnSmileBigIcon; // Button is not decode in 2nd user
 	private JButton btnCryingIcon;
 	private JButton btnSmileCryingIcon;
 	private JButton btnHeartEyeIcon;
 	private JButton buttonScaredIcon;
-	private JButton buttonSadIcon;
+	private JButton buttonSadIcon; */
 
 	public ChatGui(String user, String guest, Socket socket, int port) {
 		nameUser = user;
 		nameGuest = guest;
-		socketChat = socket;
+		socketChat = socket; // Type Socket
 		this.portServer = port;
-		EventQueue.invokeLater(new Runnable() {
+		EventQueue.invokeLater(  new Runnable() { //invokeLater() run app  trong một thread do EventQueue quản lý.
 			public void run() {
-				try {
+				try {         // code có thế xảy ra một ngoại lệ
 					ChatGui window = new ChatGui(nameUser, nameGuest, socketChat, portServer, 0);
-					window.frameChatGui.setVisible(true);
-				} catch (Exception e) {
+					//setLocationRelativeTo(null); //hiển thị cửa sổ lên vị trí giữa màn hình.
+					window.frameChatGui.setLayout(null); // Khong su dung Layout Manager ; private JFrame frameChatGui;
+					window.frameChatGui.setVisible(true); // Thiết lập tính nhìn thấy
+				} catch (Exception e) {     // Code sol các situation ngoại lệ
 					e.printStackTrace();
 				}
 			}
-		});
+		}                     );
 	}
 
 	public static void main(String[] args) {
@@ -91,15 +91,18 @@ public class ChatGui {
 			public void run() {
 				try {
 					ChatGui window = new ChatGui();
+					//setLocationRelativeTo(null);
+					window.frameChatGui.setLayout(null);
 					window.frameChatGui.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-		});
+		}                    );
 	}
 
 	public void updateChat_receive(String msg) {
+		//JTextPane txtDisplayChat;
 		appendToPane(txtDisplayChat, "<div class='left' style='width: 40%; background-color: #f1f0f0;'>"+ msg +"</div>");
 	}
 
@@ -136,7 +139,7 @@ public class ChatGui {
 	}
 
 	public ChatGui(String user, String guest, Socket socket, int port, int a)
-			throws Exception {
+			throws Exception {  // khai báo một ngoại lệ
 		nameUser = user;
 		nameGuest = guest;
 		socketChat = socket;
@@ -147,53 +150,72 @@ public class ChatGui {
 	}
 
 	private void initialize() {
-		File fileTemp = new File(URL_DIR + "/temp");
+		File fileTemp = new File(URL_DIR + "/temp"); //String URL_DIR = System.getProperty("user.dir")
+		// Folder at the end of path is temp which has fileTemp;
 		if (!fileTemp.exists()) {
 			fileTemp.mkdirs();
-		}
+		} // Frame begin
 		frameChatGui = new JFrame();
-		frameChatGui.setTitle("Private Chat");
-		frameChatGui.setResizable(false);
-		frameChatGui.setBounds(200, 200, 673, 645);
+		frameChatGui.setFont(new Font("Courier New", Font.ITALIC, 20));
+		frameChatGui.getAlignmentX();
+		frameChatGui.setTitle("<<<CHAT NO LIMITATION WITH OUR APP>>>");
+		frameChatGui.setResizable(true);
+		//frameChatGui.setFont(new Font("Courier New", Font.ITALIC, 15));
+		frameChatGui.setBackground(Color.BLACK);
+		frameChatGui.setSize(700,600);
+		frameChatGui.setLocation(100, 100);
+		frameChatGui.setAlwaysOnTop(true);
+		frameChatGui.setLocationRelativeTo(null);
+		frameChatGui.getBaseline(100, 100);
+		//frameChatGui.getBackground(); Check sự trùng lặp background của các window
+		frameChatGui.setBounds(600, 0, 700, 600);
 		frameChatGui.getContentPane().setLayout(null);
-		frameChatGui.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-		JLabel lblClientIP = new JLabel("");
-		lblClientIP.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblClientIP.setBounds(30, 6, 41, 40);
-		lblClientIP.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/user_chat.png")));
+		frameChatGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//frameChatGui.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // or exit on close
+		// Label
+		JLabel lblClientIP  = new JLabel("");
+		JLabel lblClientIP1  = new JLabel("");
+		//AtomicReference<JLabel> lblClientIP1 = new AtomicReference<>(new JLabel(""));
+		lblClientIP.setFont(new Font("Courier New", Font.ITALIC, 15));
+		lblClientIP.setBounds(20, 6, 40, 40);
+		lblClientIP1.setBounds(240, 6, 40, 40);
+		//lblClientIP.setBounds(30, 6, 41, 40);
+		lblClientIP.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/eye.png")));
+		lblClientIP1.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/eye.png")));
 		frameChatGui.getContentPane().add(lblClientIP);
-
-		textName = new JTextField(nameUser);
-		textName.setForeground(Color.RED);
-		textName.setFont(new Font("Segoe UI", Font.PLAIN, 20));
-		textName.setEditable(false);
-		textName.setBounds(70, 6, 148, 40);
+		frameChatGui.getContentPane().add(lblClientIP1);
+//textFiled for User
+		textName = new JTextField(nameUser);  // private JTextField textName;
+		textName.setForeground(Color.WHITE);
+		textName.setFont(new Font("Courier New", Font.ITALIC, 20));
+		textName.setEditable(false); // ?
+		textName.setBackground(Color.BLUE);
+		textName.setBounds(70, 6, 150, 40);
 		frameChatGui.getContentPane().add(textName);
 		textName.setText(nameGuest);
-		textName.setColumns(10);
-
-		panelMessage = new JPanel();
-		panelMessage.setBounds(6, 363, 649, 201);
-		panelMessage.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Message"));
+		textName.setColumns(100);
+// Message Panel
+		panelMessage = new JPanel(); // private JPanel panelMessage;
+		panelMessage.setBounds(6, 363, 649, 150);
+		panelMessage.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "<<<CHAT BOX WITH MESSAGE TYPED HERE>>>"));
 		frameChatGui.getContentPane().add(panelMessage);
 		panelMessage.setLayout(null);
 
 		txtMessage = new JTextField("");
-		txtMessage.setBounds(10, 21, 479, 62);
+		txtMessage.setBounds(10, 21, 550, 60);
 		panelMessage.add(txtMessage);
-		txtMessage.setColumns(10);
+		txtMessage.setColumns(10); // ?
 
 		btnSend = new JButton("");
 		btnSend.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnSend.setBounds(551, 33, 65, 39);
+		btnSend.setBounds(560, 33, 70, 50);
 		btnSend.setBorder(new EmptyBorder(0, 0, 0, 0));
 		btnSend.setContentAreaFilled(false);
 		panelMessage.add(btnSend);
-		btnSend.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/send.png")));
+		btnSend.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/send2.png")));
 		
 		btnChoose = new JButton("");
-		btnChoose.setBounds(551, 152, 50, 36);
+		btnChoose.setBounds(570, 100, 50, 36);
 		panelMessage.add(btnChoose);
 		btnChoose.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnChoose.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/attachment.png")));
@@ -218,18 +240,18 @@ public class ChatGui {
 		btnChoose.setContentAreaFilled(false);
 		
 		txtPath = new JTextField("");
-		txtPath.setBounds(76, 163, 433, 25);
+		txtPath.setBounds(76, 106, 433, 25);
 		panelMessage.add(txtPath);
 		txtPath.setEditable(false);
 		txtPath.setColumns(10);
 				
 				
 		Label label = new Label("Path");
-		label.setBounds(10, 166, 39, 22);
+		label.setBounds(10, 106, 39, 22);
 		panelMessage.add(label);
 		label.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		
-		JButton btnSendLike = new JButton("");
+	/*	JButton btnSendLike = new JButton("");
 		btnSendLike.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String msg = "<img src='" + ChatGui.class.getResource("/image/like.png") +"'></img>";
@@ -296,7 +318,7 @@ public class ChatGui {
 		panelMessage.add(btnSmileBigIcon);
 		btnSmileBigIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/smile_big.png")));
 		
-		btnCryingIcon = new JButton("");
+		/*btnCryingIcon = new JButton("");
 		btnCryingIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
 		btnCryingIcon.setContentAreaFilled(false);
 		btnCryingIcon.addActionListener(new ActionListener() {
@@ -313,9 +335,9 @@ public class ChatGui {
 		});
 		btnCryingIcon.setBounds(186, 96, 65, 36);
 		panelMessage.add(btnCryingIcon);
-		btnCryingIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/crying.png")));
+		btnCryingIcon.setIcon(new javax.swing.ImageIcon(ChatGui.class.getResource("/image/crying.png"))); */
 		
-		btnSmileCryingIcon = new JButton("");
+		/*btnSmileCryingIcon = new JButton("");
 		btnSmileCryingIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
 		btnSmileCryingIcon.setContentAreaFilled(false);
 		btnSmileCryingIcon.addActionListener(new ActionListener() {
@@ -389,7 +411,7 @@ public class ChatGui {
 		buttonSadIcon.setContentAreaFilled(false);
 		buttonSadIcon.setBorder(new EmptyBorder(0, 0, 0, 0));
 		buttonSadIcon.setBounds(476, 96, 75, 36);
-		panelMessage.add(buttonSadIcon);
+		panelMessage.add(buttonSadIcon); */
 		
 		//action when press button Send
 		btnSend.addActionListener(new ActionListener() {
@@ -459,11 +481,11 @@ public class ChatGui {
 			}
 		});
 
-		btnDisConnect = new JButton("LEAVE CHAT");
-		btnDisConnect.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		btnDisConnect = new JButton("DISCONNECT CHAT");
+		btnDisConnect.setFont(new Font("Courier New", Font.ITALIC, 20));
 		btnDisConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int result = Tags.show(frameChatGui, "Are you sure to close chat with account: "
+				int result = Tags.show(frameChatGui, "Do you accept to exit chat with that user: "
 						+ nameGuest, true);
 				if (result == 0) {
 					try {
@@ -479,7 +501,9 @@ public class ChatGui {
 			}
 		});
 		
-		btnDisConnect.setBounds(540, 6, 113, 40);
+		btnDisConnect.setBounds(340, 6, 313, 40);
+		btnDisConnect.setBackground(Color.BLUE);
+		btnDisConnect.setForeground(Color.WHITE);
 		frameChatGui.getContentPane().add(btnDisConnect);
 
 		progressSendFile = new JProgressBar(0, 100);
