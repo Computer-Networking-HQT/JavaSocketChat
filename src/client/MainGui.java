@@ -27,7 +27,7 @@ public class MainGui {
 	private JFrame frameMainGui;
 	private JTextField txtNameFriend;
 	private JButton btnChat, btnExit;
-	private JLabel lblLogo;
+	private JLabel lblLogo, lblLogo1, find;
 	private JLabel lblActiveNow;
 	private static JList<String> listActive;
 	
@@ -80,42 +80,87 @@ public class MainGui {
 	
 	private void initialize() {
 		frameMainGui = new JFrame();
-		frameMainGui.setTitle("Menu Chat");
-		frameMainGui.setResizable(false);
-		frameMainGui.setBounds(100, 100, 500, 560);
+		frameMainGui.setTitle("<<<LIST OF ONLINE USER>>>");
+		frameMainGui.setResizable(true);
+		frameMainGui.setBounds(100, 100, 300, 700);
 		frameMainGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frameMainGui.getContentPane().setLayout(null);
 
-		JLabel lblHello = new JLabel("Welcome");
-		lblHello.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		lblHello.setBounds(12, 82, 70, 16);
+		lblLogo = new JLabel("*MAIN CHAT*");
+		lblLogo.setForeground(new Color(0, 0, 205));
+		lblLogo.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/logoMain.png")));
+		lblLogo.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblLogo.setBounds(20, 13, 200, 38);
+		frameMainGui.getContentPane().add(lblLogo);
+
+		lblLogo1 = new JLabel("");
+		lblLogo1.setBounds(200, 13, 40, 40);
+		lblLogo1.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/logoMain.png")));
+		frameMainGui.getContentPane().add(lblLogo1);
+// welcome
+
+		JLabel lblHello = new JLabel("Hello you, this is your account: ");
+		lblHello.setFont(new Font("Courier New", Font.ITALIC, 14));
+		lblHello.setBounds(10, 82, 300, 16);
 		frameMainGui.getContentPane().add(lblHello);
+// TextLabel for my user
+		lblUsername = new JLabel(nameUser);
+		lblUsername.setForeground(Color.PINK);
+		lblUsername.setFont(new Font("Courier New", Font.BOLD, 15));
+		lblUsername.setBounds(10, 100, 156, 28);
+		frameMainGui.getContentPane().add(lblUsername);
+
+		// buttion exit
+		btnExit = new JButton("OFFLINE");
+		btnExit.setFont(new Font("Courier New", Font.BOLD, 15));
+		btnExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int result = Tags.show(frameMainGui, "Do you want to offline ?", true);
+				if (result == 0) {
+					try {
+						clientNode.exit();
+						frameMainGui.dispose();
+					} catch (Exception e) {
+						frameMainGui.dispose();
+					}
+				}
+			}
+		});
+		btnExit.setBounds(10, 135, 150, 30);
+		btnExit.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/stop1.png")));
+		frameMainGui.getContentPane().add(btnExit);
 
 
-		JLabel lblFriendsName = new JLabel("Name Friend: ");
-		lblFriendsName.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblFriendsName.setBounds(12, 425, 110, 16);
+//find friend
+		JLabel lblFriendsName = new JLabel("Find your friend by guest user name: ");
+		lblFriendsName.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+		lblFriendsName.setBounds(10, 180, 330, 20);
 		frameMainGui.getContentPane().add(lblFriendsName);
-		
-		txtNameFriend = new JTextField("");
-		txtNameFriend.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		txtNameFriend.setColumns(10);
-		txtNameFriend.setBounds(100, 419, 384, 28);
-		frameMainGui.getContentPane().add(txtNameFriend);
 
-		btnChat = new JButton("Chat");
-		btnChat.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		find = new JLabel("");
+		find.setBounds(10, 210, 40, 30);
+		find.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/find.png")));
+		frameMainGui.getContentPane().add(find);
+// Textfileid of namefiremd
+		txtNameFriend = new JTextField("");
+		txtNameFriend.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+		txtNameFriend.setColumns(10);
+		txtNameFriend.setBounds(50, 210, 200, 28);
+		frameMainGui.getContentPane().add(txtNameFriend);
+//button chat
+		btnChat = new JButton("CONNECT");
+		btnChat.setFont(new Font("Courier New", Font.BOLD, 15));
 
 		btnChat.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
 				String name = txtNameFriend.getText();
 				if (name.equals("") || Client.clientarray == null) {
-					Tags.show(frameMainGui, "Invaild username", false);
+					Tags.show(frameMainGui, "Username isn't valid", false);
 					return;
 				}
 				if (name.equals(nameUser)) {
-					Tags.show(frameMainGui, "This software doesn't support chat yourself function", false);
+					Tags.show(frameMainGui, "App doesn't support chat yourself/recusive function", false);
 					return;
 				}
 				int size = Client.clientarray.size();
@@ -129,46 +174,22 @@ public class MainGui {
 						}
 					}
 				}
-				Tags.show(frameMainGui, "Friend is not found. Please wait to update your list friend", false);
+				Tags.show(frameMainGui, "Friend can maybe offline. Please wait to update your list online user", false);
 			}
 		});
-		btnChat.setBounds(20, 465, 129, 44);
+		btnChat.setBounds(10, 310, 150, 30);//
 		frameMainGui.getContentPane().add(btnChat);
-		btnChat.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/chat.png")));
-		btnExit = new JButton("Exit");
-		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				int result = Tags.show(frameMainGui, "Are you sure ?", true);
-				if (result == 0) {
-					try {
-						clientNode.exit();
-						frameMainGui.dispose();
-					} catch (Exception e) {
-						frameMainGui.dispose();
-					}
-				}
-			}
-		});
-		btnExit.setBounds(353, 465, 129, 44);
-		btnExit.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/stop.png")));
-		frameMainGui.getContentPane().add(btnExit);
-		
-		lblLogo = new JLabel("CONNECT WITH EVERYONE IN THE WORLD");
-		lblLogo.setForeground(new Color(0, 0, 205));
-		lblLogo.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/connect.png")));
-		lblLogo.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblLogo.setBounds(51, 13, 413, 38);
-		frameMainGui.getContentPane().add(lblLogo);
-		
-		lblActiveNow = new JLabel("List Account Active Now");
+		btnChat.setIcon(new javax.swing.ImageIcon(MainGui.class.getResource("/image/chat1.png")));
+
+//list online
+		lblActiveNow = new JLabel("List of Online Users :");
 		lblActiveNow.setForeground(new Color(100, 149, 237));
-		lblActiveNow.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblActiveNow.setBounds(10, 123, 156, 16);
+		lblActiveNow.setFont(new Font("Courier New", Font.BOLD, 15));
+		lblActiveNow.setBounds(10, 290, 300, 16);
 		frameMainGui.getContentPane().add(lblActiveNow);
 		
 		listActive = new JList<>(model);
-		listActive.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+		listActive.setFont(new Font("Courier New", Font.BOLD, 15));
 		listActive.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -176,15 +197,10 @@ public class MainGui {
 				txtNameFriend.setText(value);
 			}
 		});
-		listActive.setBounds(12, 152, 472, 251);
+		listActive.setBounds(10, 360, 240, 240);
 		frameMainGui.getContentPane().add(listActive);
 		
-		lblUsername = new JLabel(nameUser);
-		lblUsername.setForeground(Color.RED);
-		lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-		lblUsername.setBounds(75, 76, 156, 28);
-		frameMainGui.getContentPane().add(lblUsername);
-	
+
 			
 	}
 		
