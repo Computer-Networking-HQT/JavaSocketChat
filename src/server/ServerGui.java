@@ -128,7 +128,7 @@ public class ServerGui {
 
         btnStart.setBounds(200, 300, 150, 30);			/////// Vi tri button START
         frmServerMangement.getContentPane().add(btnStart);
-        btnStart.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/start1.png")));
+//        btnStart.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/start1.png")));
 
 //		BufferedImage img = null;
 //		try {
@@ -169,7 +169,7 @@ public class ServerGui {
         });
         btnStop.setBounds(20, 300, 150, 30);						//// Vi tri button Stop
         frmServerMangement.getContentPane().add(btnStop);
-        btnStop.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/stop1.png")));
+//        btnStop.setIcon(new javax.swing.ImageIcon(ServerGui.class.getResource("/image/stop1.png")));
 
         JLabel lblnew111 = new JLabel("STATUS OF SERVER: ");
         lblnew111.setFont(new Font("Courier New", Font.BOLD, 15));
@@ -194,7 +194,7 @@ public class ServerGui {
         lbllabelUserOnline.setBounds(300, 190, 150, 16);
         frmServerMangement.getContentPane().add(lbllabelUserOnline);
 
-        lblUserOnline = new JLabel("Empty");
+        lblUserOnline = new JLabel("0");
         lblUserOnline.setForeground(Color.GREEN);
         lblUserOnline.setFont(new Font("Courier New", Font.BOLD, 15));
         lblUserOnline.setBounds(500, 190, 56, 16);

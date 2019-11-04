@@ -60,12 +60,6 @@ public class ChatGui {
 	private int portServer = 0;  // this.portServer
 	private JTextField txtMessage;
 	private JScrollPane scrollPane;
-	/* private JButton btnSmileBigIcon; // Button is not decode in 2nd user
-	private JButton btnCryingIcon;
-	private JButton btnSmileCryingIcon;
-	private JButton btnHeartEyeIcon;
-	private JButton buttonScaredIcon;
-	private JButton buttonSadIcon; */
 
 	public ChatGui(String user, String guest, Socket socket, int port) {
 		nameUser = user;
@@ -546,18 +540,19 @@ public class ChatGui {
 	public class ChatRoom extends Thread {
 
 		private Socket connect;
-		private ObjectOutputStream outPeer;
-		private ObjectInputStream inPeer;
+		private ObjectOutputStream outPeer; // luồng dữ liệu ra
+		private ObjectInputStream inPeer;// luồng dữ liệu ra
 		private boolean continueSendFile = true, finishReceive = false;
 		private int sizeOfSend = 0, sizeOfData = 0, sizeFile = 0,
 				sizeReceive = 0;
-		private String nameFileReceive = "";
+		private String nameFileReceive = ""; //tên file
 		private InputStream inFileSend;
 		private DataFile dataFile;
 
 		public ChatRoom(Socket connection, String name, String guest)
 				throws Exception {
-			connect = new Socket();
+			connect = new Socket(); // tạo một socket kết nối 2 peer lại với nhau, Đối với connection ở đây thì 1 bên là socket của peer server 1 bên
+			//là socket của peer client nên tạo được kết nối
 			connect = connection;
 			nameGuest = guest;
 		}
@@ -569,17 +564,17 @@ public class ChatGui {
 			while (!isStop) {
 				try {
 					inPeer = new ObjectInputStream(connect.getInputStream());
-					Object obj = inPeer.readObject();
-					if (obj instanceof String) {
+					Object obj = inPeer.readObject(); // đọc dữ liệu từ luồng dữ liệu vào
+					if (obj instanceof String) {// nếu obj là chuỗi
 						String msgObj = obj.toString();
-						if (msgObj.equals(Tags.CHAT_CLOSE_TAG)) {
+						if (msgObj.equals(Tags.CHAT_CLOSE_TAG)) { // nếu thông điệp nhận được là Tắt chat
 							isStop = true;
 							Tags.show(frameChatGui, nameGuest 
 									+ " closed chat with you! This windows will also be closed.", false);
 							try {	
 								isStop = true;
 								frameChatGui.dispose();
-								chat.sendMessage(Tags.CHAT_CLOSE_TAG);
+								chat.sendMessage(Tags.CHAT_CLOSE_TAG); // Gửi đi chuỗi String "<CLOSED CHAT>"
 								chat.stopChat();
 								System.gc();
 							} catch (Exception e) {
@@ -588,7 +583,7 @@ public class ChatGui {
 							connect.close();
 							break;
 						}
-						if (Decode.checkFile(msgObj)) {
+						if (Decode.checkFile(msgObj)) { //kiểm tra xem msgObj có là file không
 							isReceiveFile = true;
 							nameFileReceive = msgObj.substring(10,
 									msgObj.length() - 11);
@@ -597,18 +592,20 @@ public class ChatGui {
 									+ " for you", true);
 							if (result == 0) {
 								File fileReceive = new File(URL_DIR + TEMP
-										+ "/" + nameFileReceive);
+										+ "/" + nameFileReceive);  //Tên đường dẫn: Một đối tượng file được tạo ra
 								if (!fileReceive.exists()) {
 									fileReceive.createNewFile();
 								}
 								String msg = Tags.FILE_REQ_ACK_OPEN_TAG
 										+ Integer.toBinaryString(portServer)
 										+ Tags.FILE_REQ_ACK_CLOSE_TAG;
+								//<FILE_REQ_ACK>portOfPeerServer</FILE_REQ_ACK>
 								sendMessage(msg);
 							} else {
-								sendMessage(Tags.FILE_REQ_NOACK_TAG);
+								sendMessage(Tags.FILE_REQ_NOACK_TAG);  //Nếu không cho phép gửi file <FILE_REQ_NOACK />
 							}
-						} else if (Decode.checkFeedBack(msgObj)) {
+						} else if (Decode.checkFeedBack(msgObj)) {// check xem msgObj có dạng <FILE_REQ_ACK>portOfPeerServer</FILE_REQ_ACK>
+							// nếu phải thì phía client peer đã chấp nhận và tiến hành gửi file.
 							btnChoose.setEnabled(false);
 
 							new Thread(new Runnable() {
@@ -672,21 +669,21 @@ public class ChatGui {
 
 		
 		private void getData(String path) throws Exception {
-			File fileData = new File(path);
+			File fileData = new File(path); //tạo mới đối tượng fileData với đường dẫn path
 			if (fileData.exists()) {
 				sizeOfSend = 0;
-				dataFile = new DataFile();
+				dataFile = new DataFile(); //tạo một đối tượng DataFile để gửi đi
 				sizeFile = (int) fileData.length();
 				sizeOfData = sizeFile % 1024 == 0 ? (int) (fileData.length() / 1024)
 						: (int) (fileData.length() / 1024) + 1;
-				inFileSend = new FileInputStream(fileData);
+				inFileSend = new FileInputStream(fileData);// đọc file
 			}
 		}
 
-		public void sendFile(String path) throws Exception {
-			getData(path);
+		public void sendFile(String path) throws Exception { //tiến hành gửi file
+			getData(path); // phân tích các thông số của file dataFile,sizeFile,sizeOfData,inFileSend
 			textState.setVisible(true);
-			if (sizeOfData > Tags.MAX_MSG_SIZE/1024) {
+			if (sizeOfData > Tags.MAX_MSG_SIZE/1024) { //trường hợp file quá lớn
 				textState.setText("File is too large...");
 				inFileSend.close();
 //				isFileLarge = true;
@@ -712,15 +709,15 @@ public class ChatGui {
 						@Override
 						public void run() {
 							try {
-								inFileSend.read(dataFile.data);
-								sendMessage(dataFile);
+								inFileSend.read(dataFile.data); // đọc đối tượng file
+								sendMessage(dataFile);// gửi đi đối tượng file
 								sizeOfSend++;
 								if (sizeOfSend == sizeOfData - 1) {
 									int size = sizeFile - sizeOfSend * 1024;
-									dataFile = new DataFile(size);
+									dataFile = new DataFile(size); //tạo một đối tượng file với kích thước còn lại là size
 								}
 								progressSendFile
-										.setValue((int) (sizeOfSend * 100 / sizeOfData));
+										.setValue((int) (sizeOfSend * 100 / sizeOfData)); // cập nhập tiến trình gửi file
 								if (sizeOfSend >= sizeOfData) {
 									inFileSend.close();
 									isSendFile = true;
@@ -783,12 +780,12 @@ public class ChatGui {
 		
 		//void send Message
 		public synchronized void sendMessage(Object obj) throws Exception {
-			outPeer = new ObjectOutputStream(connect.getOutputStream());
+			outPeer = new ObjectOutputStream(connect.getOutputStream()); //khởi tạo dòng dữ liệu ra
 			// only send text
 			if (obj instanceof String) {
 				String message = obj.toString();
 				outPeer.writeObject(message);
-				outPeer.flush();
+				outPeer.flush();// gửi tin nhắn đi
 				if (isReceiveFile)
 					isReceiveFile = false;
 			} 
@@ -801,7 +798,7 @@ public class ChatGui {
 
 		public void stopChat() {
 			try {
-				connect.close();
+				connect.close();// đóng kết nối
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

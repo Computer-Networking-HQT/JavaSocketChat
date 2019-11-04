@@ -165,9 +165,10 @@ public class MainGui {
 				}
 				int size = Client.clientarray.size();
 				for (int i = 0; i < size; i++) {
-					if (name.equals(Client.clientarray.get(i).getName())) {
+					if (name.equals(Client.clientarray.get(i).getName())) { // duyệt lần lượng các client trong mảng và kiểm tra tên
 						try {
-							clientNode.intialNewChat(Client.clientarray.get(i).getHost(),Client.clientarray.get(i).getPort(), name);
+							clientNode.intialNewChat(Client.clientarray.get(i).getHost(),Client.clientarray.get(i).getPort(), name);// tạo ra chat riêng tư mới
+							//với client thứ i (tạo ra 1 socket riêng để kết nối với client thứ i )
 							return;
 						} catch (Exception e) {
 							e.printStackTrace();
