@@ -54,9 +54,9 @@ public class Login {
   frameLoginForm = new JFrame();
   frameLoginForm.setTitle("<<<LOGIN>>>");
   frameLoginForm.setResizable(true);
-  frameLoginForm.setLocationRelativeTo(null);
+  //frameLoginForm.setLocationRelativeTo(null);
   frameLoginForm.setSize(320,600);
-  //frameLoginForm.setBounds(100, 100, 517, 343);
+  frameLoginForm.setBounds(800, 100, 320, 600);
   frameLoginForm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   frameLoginForm.getContentPane().setLayout(null);
 
@@ -164,7 +164,7 @@ public class Login {
       ObjectInputStream serverInputStream = new ObjectInputStream(socketClient.getInputStream());
       msg = (String) serverInputStream.readObject();
 
-      socketClient.close();
+      socketClient.close(); //
       if (msg.equals(Tags.SESSION_DENY_TAG)) {
        lblError.setText(NAME_EXSIST);
        lblError1.setText(RETRY);
@@ -172,10 +172,11 @@ public class Login {
        lblError1.setVisible(true);
        return;
       }
-      new MainGui(IP, portPeer, name, msg);
+      new MainGui(IP, portPeer, name, msg); //
       //						new menuGUI(IP, portPeer, "toan", msg);
       frameLoginForm.dispose();
-     } catch (Exception e) {
+     }
+     catch (Exception e) {
       lblError.setText(SERVER_NOT_START);
       lblError1.setText(TURN_SERVER);
       lblError.setVisible(true);
