@@ -172,8 +172,7 @@ public class Login {
        lblError1.setVisible(true);
        return;
       }
-      new MainGui(IP, portPeer, name, msg); //
-      //						new menuGUI(IP, portPeer, "toan", msg);
+      new MainGui(IP, portPeer, name, msg);
       frameLoginForm.dispose();
      }
      catch (Exception e) {
